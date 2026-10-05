@@ -1,8 +1,8 @@
 from fastmcp import FastMCP
 from javascript import require, On
-from tools.chat import chat
-from tools.attack import attackEntity
-from tools.destroy import destroy
+from bot.tools.chat import chat
+from bot.tools.attack import attackEntity
+from bot.tools.destroy import destroy
 from dotenv import load_dotenv
 import os
 

@@ -3,6 +3,8 @@ def attackEntity(bot):
 
     if entity is None:
         bot.chat("No nearby entities to attack")
+
     else:
         bot.chat(f"Attacking {entity.name or entity.username}")
-        bot.attack(entity)
+        while entity.health > 0:
+            bot.attack(entity)
