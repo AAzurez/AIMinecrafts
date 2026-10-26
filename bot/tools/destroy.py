@@ -14,4 +14,8 @@ def destroy(bot, block_name):
          
 """
 Movement needed
+
+pick up blocks
+
+similarity word in dict
 """

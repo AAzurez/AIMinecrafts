@@ -1,42 +1,36 @@
 from fastmcp import FastMCP
 from javascript import require, On
-from bot.tools.chat import chat
 from bot.tools.attack import attackEntity
 from bot.tools.destroy import destroy
 from dotenv import load_dotenv
 import os
-
-load_dotenv()
-
-mineflayer = require('mineflayer')
-
 import anthropic 
 
+#Client Things
+load_dotenv()
 client = anthropic.Anthropic(api_key = os.getenv("API_KEY"))
 
-mcp = FastMCP("Server")
 
+#Bot Setup
 BOT_USERNAME = 'Jerry'
-
+mineflayer = require('mineflayer')
 bot = mineflayer.createBot({
     'host': '127.0.0.1',
     'port': 25565,
     'username': BOT_USERNAME
     })
 
+#MCP Stuff
+mcp = FastMCP("Server")
+
+#MCP Tools
 @mcp.tool()
 def attack_tool():
     attackEntity(bot)
-
-@mcp.tool()
-def chat_tool(sender, message):
-    print(chat(bot, sender, message))
-
 @mcp.tool()
 def destroy_tool():
-    #Find the block that was suggest/found
+    #Find the block that was suggest/found similarity word in dict
     print(destroy(bot, 'oak_leaves'))
-
 tools = [
     {
         "name": "attack",
@@ -44,18 +38,6 @@ tools = [
         "input_schema": {
             "type": "object",
             "properties": {}
-        }
-    },
-    {
-        "name": "chat",
-        "description": "Send a message in the chat",
-        "input_schema": {
-            "type": "object",
-            "properties": {
-                "sender": {"type": "string"},
-                "message": {"type": "string"}
-            },
-            "required" : ["message"]
         }
     },
     {
@@ -68,10 +50,13 @@ tools = [
     }
 ]
 
+#Functions
+#Login thing
 @On(bot, "login")
 def login(*args):
     bot.chat("Hi everyone!")
 
+#Deciding what to do
 @On(bot, 'chat')
 def handleMsg(sender, message, *args):
     if sender != BOT_USERNAME:
@@ -87,13 +72,11 @@ def handleMsg(sender, message, *args):
             max_tokens=200,
             tools = tools,
         )
-
         for block in response.content:
-            print(block)
             if block.type == "tool_use" and block.name == "attack":
                 attack_tool()
             elif block.type == "tool_use" and block.name == "chat":
-                chat_tool(sender, block.input.get("message", "..."))
+                bot.chat(message)
             elif block.type == "tool_use" and block.name == "destroy":
                 destroy_tool()
 
